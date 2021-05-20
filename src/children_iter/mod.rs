@@ -42,7 +42,6 @@ mod tests {
         stack.push(root);
 
         while let Some(node) = stack.pop() {
-            println!("Current node: {:08b}", &node.key);
             visited.insert(node.key);
 
             for child in node.children_iter() {
@@ -52,7 +51,6 @@ mod tests {
 
         for k in 0..u8::MAX {
             assert_eq!(visited.contains(&k), true);
-            println!("k {:08b} was visited {:} ", &k, visited.contains(&k));
         }
     }
 }
