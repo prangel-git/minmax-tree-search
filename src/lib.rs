@@ -1,8 +1,8 @@
-mod children_iter;
-pub use children_iter::ChildrenIter;
+mod vertex;
+pub use vertex::Vertex;
 
-mod cached_iter;
-pub use cached_iter::CachedIterator;
+mod vertex_cached;
+pub use vertex_cached::VertexCached;
 
 mod node;
 pub use node::Node;

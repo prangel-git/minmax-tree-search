@@ -2,46 +2,43 @@ use super::*;
 
 use std::rc::Rc;
 
-pub struct Node<T, Stored> 
-where 
-T: ChildrenIter
+pub struct Node<V, E, Stored>
+where
+    V: Vertex<E>,
 {
-    key: Rc<T>,
-    parent: Option<Rc<Node<T, Stored>>>,
-    children: CachedIterator<T>,
+    parent: Option<Rc<Node<V, E, Stored>>>,
+    children: VertexCached<V, E>,
     depth: usize,
     value: Stored,
 }
 
-impl<T, Stored> Node<T, Stored> 
-where 
-T: ChildrenIter
+impl<V, E, Stored> Node<V, E, Stored>
+where
+    V: Vertex<E>,
 {
     pub fn new(
-        key: Rc<T>,
-        parent: Option<Rc<Node<T, Stored>>>,
-        children: CachedIterator<T>,
+        key: &Rc<V>,
+        parent: Option<Rc<Node<V, E, Stored>>>,
         depth: usize,
         value: Stored,
     ) -> Self {
         Node {
-            key,
             parent,
-            children,
+            children: VertexCached::new(&key),
             depth,
             value,
         }
     }
 
-    pub fn key(&self) -> &Rc<T> {
-        &self.key
+    pub fn vertex(&self) -> &Rc<V> {
+        &self.children.vertex()
     }
 
-    pub fn parent(&self) -> &Option<Rc<Node<T, Stored>>> {
+    pub fn parent(&self) -> &Option<Rc<Node<V, E, Stored>>> {
         &self.parent
     }
 
-    pub fn children(&self) -> &CachedIterator<T> {
+    pub fn children(&self) -> &VertexCached<V, E> {
         &self.children
     }
 
