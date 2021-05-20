@@ -53,18 +53,18 @@ mod tests {
 
         let mut integers_cached_iter = CachedIterator::new(integers_iter_box);
 
-        assert_eq!(Some(Rc::new(1)), integers_cached_iter.next());
-        assert_eq!(Some(Rc::new(2)), integers_cached_iter.next());
-        assert_eq!(Some(Rc::new(3)), integers_cached_iter.next());
-        assert_eq!(Some(Rc::new(4)), integers_cached_iter.next());
+        for i in 0..integers.len() {
+            assert_eq!(Some(Rc::new(integers[i])), integers_cached_iter.next());    
+        }
+        
+        assert_eq!(None, integers_cached_iter.next());
         assert_eq!(None, integers_cached_iter.next());
 
         integers_cached_iter.reset();
 
-        assert_eq!(Some(Rc::new(1)), integers_cached_iter.next());
-        assert_eq!(Some(Rc::new(2)), integers_cached_iter.next());
-        assert_eq!(Some(Rc::new(3)), integers_cached_iter.next());
-        assert_eq!(Some(Rc::new(4)), integers_cached_iter.next());
-        assert_eq!(None, integers_cached_iter.next());
+        for i in 0..integers.len() {
+            assert_eq!(Some(Rc::new(integers[i])), integers_cached_iter.next());    
+        }
+        
     }
 }
