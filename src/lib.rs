@@ -1,3 +1,6 @@
+mod children_iter;
+pub use children_iter::ChildrenIter;
+
 mod cached_iter;
 pub use cached_iter::CachedIterator;
 

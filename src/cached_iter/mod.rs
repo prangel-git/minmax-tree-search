@@ -1,16 +1,24 @@
 use std::rc::Rc;
 
-pub struct CachedIterator<T> {
+use crate::ChildrenIter;
+
+pub struct CachedIterator<T> 
+where 
+T: ChildrenIter
+{
     visited: Vec<Rc<T>>,
     to_visit: Box<dyn Iterator<Item = T>>,
     index: usize,
 }
 
-impl<T> CachedIterator<T> {
-    pub fn new(to_visit: Box<dyn Iterator<Item = T>>) -> Self {
+impl<T> CachedIterator<T>
+where 
+T: ChildrenIter
+{
+    pub fn new(generator: &T) -> Self {
         CachedIterator {
             visited: Vec::new(),
-            to_visit,
+            to_visit: generator.children_iter(),
             index: 0,
         }
     }
@@ -20,7 +28,10 @@ impl<T> CachedIterator<T> {
     }
 }
 
-impl<T> Iterator for CachedIterator<T> {
+impl<T> Iterator for CachedIterator<T>
+where 
+T: ChildrenIter
+{
     type Item = Rc<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -38,32 +49,6 @@ impl<T> Iterator for CachedIterator<T> {
             let index = self.index;
             self.index += 1;
             Some(self.visited[index].clone())
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn simple_iterator() {
-        let integers = vec![1, 2, 3, 4];
-        let integers_iter_box = Box::new(integers.clone().into_iter());
-
-        let mut integers_cached_iter = CachedIterator::new(integers_iter_box);
-
-        for i in 0..integers.len() {
-            assert_eq!(Some(Rc::new(integers[i])), integers_cached_iter.next());
-        }
-
-        assert_eq!(None, integers_cached_iter.next());
-        assert_eq!(None, integers_cached_iter.next());
-
-        integers_cached_iter.reset();
-
-        for i in 0..integers.len() {
-            assert_eq!(Some(Rc::new(integers[i])), integers_cached_iter.next());
         }
     }
 }
