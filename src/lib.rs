@@ -1,5 +1,5 @@
-mod children_iterator;
-pub use children_iterator::ChildrenIterator;
+mod cached_iter;
+pub use cached_iter::CachedIterator;
 
 mod node;
 pub use node::Node;

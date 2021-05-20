@@ -1,10 +1,10 @@
-use super::ChildrenIterator;
+use super::CachedIterator;
 use std::rc::Rc;
 
 pub struct Node<T, Stored> {
     key: Rc<T>,
     parent: Option<Rc<T>>,
-    children: ChildrenIterator<T>,
+    children: CachedIterator<T>,
     depth: usize,
     value: Stored,
 }
@@ -13,7 +13,7 @@ impl<T, Stored> Node<T, Stored> {
     pub fn new(
         key: Rc<T>,
         parent: Option<Rc<T>>,
-        children: ChildrenIterator<T>,
+        children: CachedIterator<T>,
         depth: usize,
         value: Stored,
     ) -> Self {
@@ -34,7 +34,7 @@ impl<T, Stored> Node<T, Stored> {
         &self.parent
     }
 
-    pub fn children(&self) -> &ChildrenIterator<T> {
+    pub fn children(&self) -> &CachedIterator<T> {
         &self.children
     }
 
