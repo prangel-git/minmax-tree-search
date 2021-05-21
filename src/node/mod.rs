@@ -2,31 +2,24 @@ use super::*;
 
 use std::rc::Rc;
 
-pub struct Node<V, E, Stored>
+pub struct Node<V, E, D>
 where
     V: Vertex<E>,
 {
-    parent: Option<Rc<Node<V, E, Stored>>>,
+    parent: Option<Rc<Node<V, E, D>>>,
     children: VertexCached<V, E>,
-    depth: usize,
-    value: Stored,
+    data: D,
 }
 
-impl<V, E, Stored> Node<V, E, Stored>
+impl<V, E, D> Node<V, E, D>
 where
     V: Vertex<E>,
 {
-    pub fn new(
-        key: &Rc<V>,
-        parent: Option<Rc<Node<V, E, Stored>>>,
-        depth: usize,
-        value: Stored,
-    ) -> Self {
+    pub fn new(key: &Rc<V>, parent: Option<Rc<Node<V, E, D>>>, data: D) -> Self {
         Node {
             parent,
             children: VertexCached::new(&key),
-            depth,
-            value,
+            data,
         }
     }
 
@@ -34,7 +27,7 @@ where
         &self.children.vertex()
     }
 
-    pub fn parent(&self) -> &Option<Rc<Node<V, E, Stored>>> {
+    pub fn parent(&self) -> &Option<Rc<Node<V, E, D>>> {
         &self.parent
     }
 
@@ -42,11 +35,7 @@ where
         &self.children
     }
 
-    pub fn depth(&self) -> usize {
-        self.depth
-    }
-
-    pub fn value(&self) -> &Stored {
-        &self.value
+    pub fn value(&self) -> &D {
+        &self.data
     }
 }

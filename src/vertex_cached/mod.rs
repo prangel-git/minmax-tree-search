@@ -7,7 +7,7 @@ where
     V: Vertex<E>,
 {
     vertex: Rc<V>,
-    visited: Vec<(E, Rc<V>)>,
+    visited: Vec<(Rc<V>, E)>,
     to_visit: Box<dyn Iterator<Item = E>>,
     index: usize,
 }
@@ -39,23 +39,21 @@ where
     E: Copy,
     V: Vertex<E>,
 {
-    type Item = (E, Rc<V>);
+    type Item = (Rc<V>, E);
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index >= self.visited.len() {
             match self.to_visit.next() {
                 None => None,
-                Some(e) => {
-                    match self.vertex.next_vertex(e) {
-                        Some(v) => {
-                            let output = (e, v);
-                            self.visited.push(output.clone());
-                            self.index += 1;
-                            Some(output)
-                        }
-                        None => {None}
+                Some(e) => match self.vertex.next_vertex(e) {
+                    Some(v) => {
+                        let output = (v, e);
+                        self.visited.push(output.clone());
+                        self.index += 1;
+                        Some(output)
                     }
-                }
+                    None => None,
+                },
             }
         } else {
             let index = self.index;
