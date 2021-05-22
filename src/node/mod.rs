@@ -1,21 +1,24 @@
 use super::*;
 
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
-pub struct Node<V, E, D>
+pub type NodeRefCell<V, D> = RefCell<Node<V,D>>;
+pub type NodeRcRefCell<V, D> = Rc<NodeRefCell<V, D>>;
+
+pub struct Node<V, D>
 where
-    V: Vertex<E>,
+    V: Vertex,
 {
-    parent: Option<Rc<Node<V, E, D>>>,
-    children: VertexCached<V, E>,
-    data: D,
+    parent: Option<NodeRcRefCell<V, D>>,
+    children: VertexCached<V>,
+    pub data: D,
 }
 
-impl<V, E, D> Node<V, E, D>
+impl<V, D> Node<V, D>
 where
-    V: Vertex<E>,
+    V: Vertex,
 {
-    pub fn new(key: &Rc<V>, parent: Option<Rc<Node<V, E, D>>>, data: D) -> Self {
+    pub fn new(key: &Rc<V>, parent: Option<Rc<RefCell<Node<V, D>>>>, data: D) -> Self {
         Node {
             parent,
             children: VertexCached::new(&key),
@@ -27,15 +30,11 @@ where
         &self.children.vertex()
     }
 
-    pub fn parent(&self) -> &Option<Rc<Node<V, E, D>>> {
+    pub fn parent(&self) -> &Option<NodeRcRefCell<V, D>> {
         &self.parent
     }
 
-    pub fn children(&self) -> &VertexCached<V, E> {
+    pub fn children(&self) -> &VertexCached<V> {
         &self.children
-    }
-
-    pub fn value(&self) -> &D {
-        &self.data
     }
 }

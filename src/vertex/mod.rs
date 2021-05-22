@@ -1,7 +1,9 @@
 use std::rc::Rc;
 
-pub trait Vertex<E> {
-    fn edges(&self) -> Box<dyn Iterator<Item = E>>;
+pub trait Vertex {
+    type Edges: Copy;
 
-    fn next_vertex(&self, edge: E) -> Option<Rc<Self>>;
+    fn edges(&self) -> Box<dyn Iterator<Item = Self::Edges>>;
+
+    fn next_vertex(&self, edge: Self::Edges) -> Option<Rc<Self>>;
 }

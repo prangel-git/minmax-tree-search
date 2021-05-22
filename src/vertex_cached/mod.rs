@@ -2,19 +2,19 @@ use std::rc::Rc;
 
 use super::*;
 
-pub struct VertexCached<V, E>
+pub struct VertexCached<V>
 where
-    V: Vertex<E>,
+    V: Vertex,
 {
     vertex: Rc<V>,
-    visited: Vec<(Rc<V>, E)>,
-    to_visit: Box<dyn Iterator<Item = E>>,
+    visited: Vec<(Rc<V>, V::Edges)>,
+    to_visit: Box<dyn Iterator<Item = V::Edges>>,
     index: usize,
 }
 
-impl<V, E> VertexCached<V, E>
+impl<V> VertexCached<V>
 where
-    V: Vertex<E>,
+    V: Vertex,
 {
     pub fn new(vertex: &Rc<V>) -> Self {
         VertexCached {
@@ -34,12 +34,11 @@ where
     }
 }
 
-impl<V, E> Iterator for VertexCached<V, E>
+impl<V> Iterator for VertexCached<V>
 where
-    E: Copy,
-    V: Vertex<E>,
+    V: Vertex,
 {
-    type Item = (Rc<V>, E);
+    type Item = (Rc<V>, V::Edges);
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index >= self.visited.len() {

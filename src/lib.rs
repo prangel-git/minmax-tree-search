@@ -5,7 +5,10 @@ mod vertex_cached;
 pub use vertex_cached::VertexCached;
 
 mod node;
-pub use node::Node;
+pub use node::*;
+
+pub mod minmax;
+
 
 #[cfg(test)]
 mod tests {
