@@ -9,8 +9,8 @@ pub struct Node<V, D>
 where
     V: Vertex,
 {
-    parent: Option<NodeRcRefCell<V, D>>,
-    children: VertexCached<V>,
+    pub parent: Option<NodeRcRefCell<V, D>>,
+    pub children: VertexCached<V>,
     pub data: D,
 }
 
@@ -28,13 +28,5 @@ where
 
     pub fn vertex(&self) -> &Rc<V> {
         &self.children.vertex()
-    }
-
-    pub fn parent(&self) -> &Option<NodeRcRefCell<V, D>> {
-        &self.parent
-    }
-
-    pub fn children(&self) -> &VertexCached<V> {
-        &self.children
     }
 }
