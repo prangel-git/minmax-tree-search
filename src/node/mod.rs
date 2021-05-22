@@ -2,7 +2,7 @@ use super::*;
 
 use std::{cell::RefCell, rc::Rc};
 
-pub type NodeRefCell<V, D> = RefCell<Node<V,D>>;
+pub type NodeRefCell<V, D> = RefCell<Node<V, D>>;
 pub type NodeRcRefCell<V, D> = Rc<NodeRefCell<V, D>>;
 
 pub struct Node<V, D>

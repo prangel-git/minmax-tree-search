@@ -9,7 +9,6 @@ pub use node::*;
 
 pub mod minmax;
 
-
 #[cfg(test)]
 mod tests {
     #[test]
