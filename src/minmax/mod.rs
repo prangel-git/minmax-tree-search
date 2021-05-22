@@ -30,6 +30,8 @@ impl NodeData {
     pub fn update(&mut self, new_value: f64) {
         if self.kind == NodeKind::Maximizer {
             self.value = self.value.max(new_value);
+        } else {
+            self.value = self.value.min(new_value)
         }
     }
 }
