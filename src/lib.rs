@@ -9,6 +9,8 @@ pub use node::*;
 
 pub mod minmax;
 
+pub mod binary_tree;
+
 #[cfg(test)]
 mod tests {
     #[test]

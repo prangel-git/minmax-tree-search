@@ -1,12 +1,15 @@
-use std::{cell::RefCell, rc::Rc};
+use std::cell::RefCell;
+use std::rc::Rc;
+
 
 use super::*;
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum NodeKind {
     Minimizer,
     Maximizer,
 }
 
+#[derive(Debug)]
 pub struct NodeData {
     pub kind: NodeKind,
     pub depth: usize,
@@ -52,11 +55,15 @@ where
     V: Vertex,
 {
     pub fn new(
-        root: NodeRcRefCell<V, NodeData>,
+        root_vertex: Rc<V>,
         reward: Box<dyn Fn(&V) -> f64>,
         kind: Box<dyn Fn(&V) -> NodeKind>,
         depth: usize,
     ) -> Self {
+        let root_kind = kind(&root_vertex);
+        let root_data = NodeData::new(root_kind);
+        let root = Rc::new(RefCell::new(Node::new(&root_vertex, None, root_data)));
+
         let cache = Self::minmax_search(root.clone(), &reward, &kind, depth);
 
         MinMax {
