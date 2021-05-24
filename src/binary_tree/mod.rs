@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::minmax::*;
 use crate::Vertex;
 
-#[derive(Debug)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 pub struct BinaryVertex {
     pub label: u8,
 }
@@ -76,20 +76,42 @@ mod test {
         let kin = Box::new(kind);
         let depth = 9usize;
 
-        let minmax_tree = MinMax::new(root, rew, kin, depth);
+        let mut minmax_tree = MinMax::new(root, rew, kin, depth);
 
-        for (idx, node) in minmax_tree.cache.iter().enumerate() {
+        println!("Original MinMax tree");
+        for (idx, (vertex, node)) in minmax_tree.cache.iter().enumerate() {
             let node_ptr = node.borrow();
 
             println!(
-                "Index: {:?}, Vertex {:?}, Value: {:?}, Kind {:?}, Depth {:?}, Edge {:?}",
+                "Index: {:?}, VertexKey: {:?}, Vertex {:?}, Value: {:?}, Kind {:?}, Depth {:?}, Edge {:?}",
                 idx,
+                vertex,
                 node_ptr.vertex(),
                 node_ptr.data.value,
                 node_ptr.data.kind,
                 node_ptr.data.depth,
                 node_ptr.data.edge,
             );
-        }
+        };
+
+        let new_root = Rc::new(BinaryVertex::new(2));
+
+        minmax_tree.update(new_root);
+
+        println!("After update: ");
+        for (idx, (vertex, node)) in minmax_tree.cache.iter().enumerate() {
+            let node_ptr = node.borrow();
+
+            println!(
+                "Index: {:?}, VertexKey: {:?}, Vertex {:?}, Value: {:?}, Kind {:?}, Depth {:?}, Edge {:?}",
+                idx,
+                vertex,
+                node_ptr.vertex(),
+                node_ptr.data.value,
+                node_ptr.data.kind,
+                node_ptr.data.depth,
+                node_ptr.data.edge,
+            );
+        };
     }
 }

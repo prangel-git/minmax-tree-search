@@ -1,8 +1,10 @@
 use std::cell::RefCell;
+use std::collections::HashMap;
+use std::hash::Hash;
 use std::rc::Rc;
 
 use super::*;
-#[derive(PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum NodeKind {
     Minimizer,
     Maximizer,
@@ -56,51 +58,61 @@ pub struct MinMax<V>
 where
     V: Vertex,
 {
-    pub root: NodeRcRefCell<V, NodeData<V>>,
+    pub root: Rc<V>,
     pub reward: Box<dyn Fn(&V) -> f64>,
     pub kind: Box<dyn Fn(&V) -> NodeKind>,
     pub depth: usize,
-    pub cache: Vec<NodeRcRefCell<V, NodeData<V>>>,
+    pub cache: HashMap<Rc<V>, NodeRcRefCell<V, NodeData<V>>>,
 }
 
 impl<V> MinMax<V>
 where
-    V: Vertex,
+    V: Vertex + Hash + Eq,
 {
     pub fn new(
-        root_vertex: Rc<V>,
+        root: Rc<V>,
         reward: Box<dyn Fn(&V) -> f64>,
         kind: Box<dyn Fn(&V) -> NodeKind>,
         depth: usize,
     ) -> Self {
-        let root_kind = kind(&root_vertex);
-        let root_data = NodeData::new(root_kind);
-        let root = Rc::new(RefCell::new(Node::new(&root_vertex, None, None, root_data)));
+        let cache = HashMap::new();
 
-        let cache = Self::minmax_search(root.clone(), &reward, &kind, depth);
-
-        MinMax {
+        let mut output = MinMax {
             root,
             reward,
             kind,
             depth,
             cache,
-        }
+        };
+
+        output.minmax_search();
+        return output;
     }
 
-    fn minmax_search(
-        root: NodeRcRefCell<V, NodeData<V>>,
-        reward: &Box<dyn Fn(&V) -> f64>,
-        kind: &Box<dyn Fn(&V) -> NodeKind>,
-        depth: usize,
-    ) -> Vec<NodeRcRefCell<V, NodeData<V>>> {
-        let root_kind = kind(root.borrow().vertex());
-        root.borrow_mut().data = NodeData::new(root_kind);
+    pub fn update(&mut self, root: Rc<V>) {
+        self.root = root.clone();
+        self.minmax_search();
+    }
+
+    fn minmax_search(&mut self) {
+        let kind = &self.kind;
+        let reward = &self.reward;
+
+        let root_data = NodeData::new(kind(&self.root));
+        let root_node = if let Some(root_node_tmp) = self.cache.get(&self.root) {
+            let mut root_node_ptr = root_node_tmp.borrow_mut();
+            root_node_ptr.data = root_data;
+            root_node_ptr.parent = None;
+            root_node_ptr.edge = None;
+            root_node_tmp.clone()
+        } else {
+            Rc::new(RefCell::new(Node::new(&self.root, None, None, root_data)))
+        };
 
         let mut stack = Vec::new();
-        let mut cache = Vec::new();
+        let mut cache = HashMap::new();
 
-        stack.push(root.clone());
+        stack.push(root_node.clone());
 
         while let Some(node) = stack.pop() {
             let mut node_ptr = node.borrow_mut();
@@ -110,7 +122,7 @@ where
 
                     let next_depth = node_ptr.data.depth + 1;
 
-                    if next_depth <= depth {
+                    if next_depth <= self.depth {
                         let next_kind = kind(&next_vertex);
 
                         let next_value = if next_vertex.is_terminal() {
@@ -146,11 +158,13 @@ where
                         p.borrow_mut().data.update(this_value, *e);
                     };
 
-                    cache.push(node.clone());
+                    node_ptr.children.reset();
+
+                    cache.insert(node_ptr.vertex().clone(), node.clone());
                 }
             }
         }
 
-        return cache;
+        self.cache = cache;
     }
 }
