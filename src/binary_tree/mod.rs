@@ -74,7 +74,7 @@ mod test {
         let root = Rc::new(BinaryVertex::new(0));
         let rew = Box::new(reward);
         let kin = Box::new(kind);
-        let depth = 8usize;
+        let depth = 9usize;
 
         let minmax_tree = MinMax::new(root, rew, kin, depth);
 
@@ -82,12 +82,13 @@ mod test {
             let node_ptr = node.borrow();
 
             println!(
-                "Index: {:?}, Vertex {:?}, Value: {:?}, Kind {:?}, Depth {:?}",
+                "Index: {:?}, Vertex {:?}, Value: {:?}, Kind {:?}, Depth {:?}, Edge {:?}",
                 idx,
                 node_ptr.vertex(),
                 node_ptr.data.value,
                 node_ptr.data.kind,
-                node_ptr.data.depth
+                node_ptr.data.depth,
+                node_ptr.data.edge,
             );
         }
     }

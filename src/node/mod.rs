@@ -10,6 +10,7 @@ where
     V: Vertex,
 {
     pub parent: Option<NodeRcRefCell<V, D>>,
+    pub edge: Option<V::Edges>,
     pub children: VertexCached<V>,
     pub data: D,
 }
@@ -18,9 +19,15 @@ impl<V, D> Node<V, D>
 where
     V: Vertex,
 {
-    pub fn new(key: &Rc<V>, parent: Option<Rc<RefCell<Node<V, D>>>>, data: D) -> Self {
+    pub fn new(
+        key: &Rc<V>,
+        parent: Option<Rc<RefCell<Node<V, D>>>>,
+        edge: Option<V::Edges>,
+        data: D,
+    ) -> Self {
         Node {
             parent,
+            edge,
             children: VertexCached::new(&key),
             data,
         }
