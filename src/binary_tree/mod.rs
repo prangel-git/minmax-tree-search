@@ -3,7 +3,6 @@ use std::rc::Rc;
 use crate::minmax::*;
 use crate::Vertex;
 
-
 #[derive(Debug)]
 pub struct BinaryVertex {
     pub label: u8,
@@ -42,12 +41,20 @@ impl Vertex for BinaryVertex {
     }
 
     fn is_terminal(&self) -> bool {
-        self.label < (1 << 7)
+        self.label >= (1 << 7)
     }
 }
 
 pub fn kind(vertex: &BinaryVertex) -> NodeKind {
-    if vertex.label % 2 == 1 {
+    let mut length = 0u8;
+    let mut label = vertex.label;
+
+    while label > 0 {
+        length += 1;
+        label >>= 1;
+    }
+
+    if length % 2 == 1 {
         NodeKind::Maximizer
     } else {
         NodeKind::Minimizer
@@ -67,12 +74,21 @@ mod test {
         let root = Rc::new(BinaryVertex::new(0));
         let rew = Box::new(reward);
         let kin = Box::new(kind);
-        let depth = 10usize;
+        let depth = 8usize;
 
         let minmax_tree = MinMax::new(root, rew, kin, depth);
 
-        for node in minmax_tree.cache {
-            println!("Vertex {:?}", node.borrow().vertex());
+        for (idx, node) in minmax_tree.cache.iter().enumerate() {
+            let node_ptr = node.borrow();
+
+            println!(
+                "Index: {:?}, Vertex {:?}, Value: {:?}, Kind {:?}, Depth {:?}",
+                idx,
+                node_ptr.vertex(),
+                node_ptr.data.value,
+                node_ptr.data.kind,
+                node_ptr.data.depth
+            );
         }
     }
 }

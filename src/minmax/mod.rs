@@ -1,7 +1,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-
 use super::*;
 #[derive(PartialEq, Debug)]
 pub enum NodeKind {
@@ -90,13 +89,16 @@ where
         stack.push(root.clone());
 
         while let Some(node) = stack.pop() {
-            match node.borrow_mut().children.next() {
+            let mut node_ptr = node.borrow_mut();
+            match node_ptr.children.next() {
                 Some((next_vertex, _)) => {
                     stack.push(node.clone());
 
-                    let next_depth = node.borrow().data.depth + 1;
-                    if next_depth < depth {
+                    let next_depth = node_ptr.data.depth + 1;
+
+                    if next_depth <= depth {
                         let next_kind = kind(&next_vertex);
+
                         let next_value = if next_vertex.is_terminal() {
                             reward(&next_vertex)
                         } else if next_kind == NodeKind::Maximizer {
@@ -118,16 +120,13 @@ where
                         )));
 
                         stack.push(next_node.clone());
-                        cache.push(next_node);
                     } else {
-                        if let Some(p) = &node.borrow().parent {
-                            p.borrow_mut().data.update(reward(&next_vertex));
-                        };
+                        node_ptr.data.update(reward(&next_vertex));
                     }
                 }
                 None => {
-                    if let Some(p) = &node.borrow().parent {
-                        let this_value = node.borrow().data.value;
+                    if let Some(p) = &node_ptr.parent {
+                        let this_value = node_ptr.data.value;
                         p.borrow_mut().data.update(this_value);
                     };
 
