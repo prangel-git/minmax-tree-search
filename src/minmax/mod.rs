@@ -36,6 +36,7 @@ where
     ) -> Self {
         let cache = HashMap::new();
         let root_clone = root.clone();
+        let depth = depth + 1; // Depth 0 will be reserved for data initialization
 
         let mut output = MinMax {
             root,
@@ -58,50 +59,63 @@ where
         self.cache = cache;
     }
 
+    fn kind(&self, vertex: &Rc<V>) -> NodeKind {
+        let kind = &self.kind;
+        kind(vertex)
+    }
+
+    fn reward(&self, vertex: &Rc<V>) -> f64 {
+        let reward = &self.reward;
+        reward(vertex)
+    }
+
     fn minmax(
         &mut self,
         base: Rc<V>,
         depth: usize,
         cache: &mut HashMap<Rc<V>, NodeRcRefCell<V, NodeData<V>>>,
-    ) -> NodeData<V> {
-        let kind = &self.kind;
-        let reward = &self.reward;
-
-        let root = self
-            .cache
-            .get(&base)
-            .cloned()
-            .unwrap_or(Rc::new(RefCell::new(Node::new(
-                &base,
-                NodeData::new(kind(&base)),
-            ))));
+    ) -> f64 {
+        let root = self.get_or_insert(base.clone());
 
         let mut root_ptr = root.borrow_mut();
 
-        if root_ptr.data.depth >= depth && depth > 0 {
+        if root_ptr.data.depth >= depth {
         } else if root_ptr.vertex().is_terminal() {
             root_ptr.data = NodeData {
-                kind: kind(&base),
+                kind: self.kind(&base),
                 depth: usize::MAX,
-                value: reward(&base),
+                value: self.reward(&base),
                 edge: None,
             };
-        } else if depth == 0 {
+        } else if depth == 1 {
             root_ptr.data = NodeData {
-                kind: kind(&base),
+                kind: self.kind(&base),
                 depth: 0,
-                value: reward(&base),
+                value: self.reward(&base),
                 edge: None,
             };
         } else {
             while let Some((child, edge)) = root_ptr.children.next() {
-                let child_data = self.minmax(child, depth - 1, cache);
-                root_ptr.data.update(child_data.value, edge);
+                let value = self.minmax(child, depth - 1, cache);
+                root_ptr.data.update(value, edge);
             }
+            root_ptr.data.depth = depth;
             root_ptr.children.reset();
         }
 
         cache.insert(base.clone(), root.clone());
-        root_ptr.data.clone()
+        root_ptr.data.value
+    }
+
+    fn get_or_insert(&mut self, base: Rc<V>) -> NodeRcRefCell<V, NodeData<V>> {
+        let kind = &self.kind;
+        let a = self
+            .cache
+            .entry(base.clone())
+            .or_insert(Rc::new(RefCell::new(Node::new(
+                &base,
+                NodeData::new(kind(&base)),
+            ))));
+        a.clone()
     }
 }
