@@ -3,7 +3,7 @@ use std::rc::Rc;
 use crate::minmax::*;
 use crate::Vertex;
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub struct BinaryVertex {
     pub label: u8,
 }
@@ -92,7 +92,7 @@ mod test {
                 node_ptr.data.depth,
                 node_ptr.data.edge,
             );
-        };
+        }
 
         let new_root = Rc::new(BinaryVertex::new(2));
 
@@ -112,6 +112,6 @@ mod test {
                 node_ptr.data.depth,
                 node_ptr.data.edge,
             );
-        };
+        }
     }
 }
