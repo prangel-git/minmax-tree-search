@@ -47,6 +47,7 @@ where
 
         let mut cache = HashMap::new();
         output.minmax(root_clone, depth, &mut cache);
+        output.cache = cache;
         return output;
     }
 
