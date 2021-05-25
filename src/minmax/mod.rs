@@ -60,6 +60,13 @@ where
         self.cache = cache;
     }
 
+    pub fn get_root_value_edge(&self) -> (f64, Option<V::Edges>) {
+        match self.cache.get(&self.root) {
+            Some(node) => (node.borrow().data.value, node.borrow().data.edge),
+            None => (f64::NAN, None),
+        }
+    }
+
     fn minmax(
         &mut self,
         base: Rc<V>,
@@ -78,6 +85,8 @@ where
             root_ptr.data.depth = 1;
             root_ptr.data.value = self.reward(&base);
         } else {
+            root_ptr.reset();
+
             if root_ptr.data.kind == NodeKind::Maximizer {
                 let mut value = f64::NEG_INFINITY;
                 while let Some((child, edge)) = root_ptr.next() {
@@ -101,7 +110,6 @@ where
             }
 
             root_ptr.data.depth = depth;
-            root_ptr.reset();
         }
 
         cache.insert(base.clone(), root.clone());

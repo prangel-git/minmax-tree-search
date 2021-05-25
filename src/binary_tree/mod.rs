@@ -94,6 +94,11 @@ mod test {
             );
         }
 
+        println!(
+            "Value and edge of root {:?}",
+            minmax_tree.get_root_value_edge()
+        );
+
         let new_root = Rc::new(BinaryVertex::new(2));
 
         minmax_tree.update(new_root);
@@ -113,5 +118,10 @@ mod test {
                 node_ptr.data.edge,
             );
         }
+
+        println!(
+            "Value and edge of root {:?}",
+            minmax_tree.get_root_value_edge()
+        );
     }
 }
