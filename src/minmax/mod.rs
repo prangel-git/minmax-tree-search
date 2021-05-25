@@ -60,16 +60,6 @@ where
         self.cache = cache;
     }
 
-    fn kind(&self, vertex: &Rc<V>) -> NodeKind {
-        let kind = &self.kind;
-        kind(vertex)
-    }
-
-    fn reward(&self, vertex: &Rc<V>) -> f64 {
-        let reward = &self.reward;
-        reward(vertex)
-    }
-
     fn minmax(
         &mut self,
         base: Rc<V>,
@@ -116,6 +106,16 @@ where
 
         cache.insert(base.clone(), root.clone());
         root_ptr.data.value
+    }
+
+    fn kind(&self, vertex: &Rc<V>) -> NodeKind {
+        let kind = &self.kind;
+        kind(vertex)
+    }
+
+    fn reward(&self, vertex: &Rc<V>) -> f64 {
+        let reward = &self.reward;
+        reward(vertex)
     }
 
     fn get_or_insert(&mut self, base: Rc<V>) -> NodeRcRefCell<V, NodeData<V>> {
