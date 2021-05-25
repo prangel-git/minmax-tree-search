@@ -1,5 +1,5 @@
-use crate::vertex::Vertex;
 use super::NodeKind;
+use crate::vertex::Vertex;
 
 #[derive(Debug, Clone)]
 pub struct NodeData<V>
