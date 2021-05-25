@@ -67,29 +67,19 @@ where
         let kind = &self.kind;
         let reward = &self.reward;
 
-        let _root = self.cache.get(&base).cloned().unwrap_or(
-            Rc::new(RefCell::new(Node::new(
-                &base, 
-                NodeData::new(kind(&base))
-            )))
-        );
-
-        let root = if let Some(node) = self.cache.get(&base).cloned() {
-            let data = node.borrow().data.clone();
-            if data.depth >= depth {
-                cache.insert(base.clone(), node.clone());
-                return data;
-            }
-            node.clone()
-        } else {
-            let node_data = NodeData::new(kind(&base));
-            let node = Rc::new(RefCell::new(Node::new(&base, node_data)));
-            node
-        };
+        let root = self
+            .cache
+            .get(&base)
+            .cloned()
+            .unwrap_or(Rc::new(RefCell::new(Node::new(
+                &base,
+                NodeData::new(kind(&base)),
+            ))));
 
         let mut root_ptr = root.borrow_mut();
 
-        if root_ptr.vertex().is_terminal() {
+        if root_ptr.data.depth >= depth && depth > 0 {
+        } else if root_ptr.vertex().is_terminal() {
             root_ptr.data = NodeData {
                 kind: kind(&base),
                 depth: usize::MAX,

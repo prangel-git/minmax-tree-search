@@ -18,10 +18,7 @@ impl<V, D> Node<V, D>
 where
     V: Vertex,
 {
-    pub fn new(
-        key: &Rc<V>,
-        data: D,
-    ) -> Self {
+    pub fn new(key: &Rc<V>, data: D) -> Self {
         Node {
             children: VertexCached::new(&key),
             data,
