@@ -1,7 +1,5 @@
 pub mod vertex;
 
-pub mod vertex_cached;
-
 pub mod node;
 
 pub mod minmax;

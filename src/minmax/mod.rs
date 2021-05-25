@@ -10,8 +10,9 @@ use std::hash::Hash;
 use std::rc::Rc;
 
 use crate::node::Node;
-use crate::node::NodeRcRefCell;
 use crate::vertex::Vertex;
+
+type NodeRcRefCell<V, D> = Rc<RefCell<Node<V, D>>>;
 
 pub struct MinMax<V>
 where
@@ -89,7 +90,7 @@ where
         } else {
             if root_ptr.data.kind == NodeKind::Maximizer {
                 let mut value = f64::NEG_INFINITY;
-                while let Some((child, edge)) = root_ptr.children.next() {
+                while let Some((child, edge)) = root_ptr.next() {
                     let child_value = self.minmax(child, depth - 1, cache);
                     if value < child_value {
                         value = child_value;
@@ -99,7 +100,7 @@ where
                 }
             } else {
                 let mut value = f64::INFINITY;
-                while let Some((child, edge)) = root_ptr.children.next() {
+                while let Some((child, edge)) = root_ptr.next() {
                     let child_value = self.minmax(child, depth - 1, cache);
                     if value > child_value {
                         value = child_value;
@@ -110,7 +111,7 @@ where
             }
 
             root_ptr.data.depth = depth;
-            root_ptr.children.reset();
+            root_ptr.reset();
         }
 
         cache.insert(base.clone(), root.clone());
@@ -119,13 +120,13 @@ where
 
     fn get_or_insert(&mut self, base: Rc<V>) -> NodeRcRefCell<V, NodeData<V>> {
         let node_kind = self.kind(&base);
-        let a = self
+        let output = self
             .cache
             .entry(base.clone())
             .or_insert(Rc::new(RefCell::new(Node::new(
                 &base,
                 NodeData::new(node_kind),
             ))));
-        a.clone()
+        output.clone()
     }
 }
