@@ -81,24 +81,34 @@ where
 
         if root_ptr.data.depth >= depth {
         } else if root_ptr.vertex().is_terminal() {
-            root_ptr.data = NodeData {
-                kind: self.kind(&base),
-                depth: usize::MAX,
-                value: self.reward(&base),
-                edge: None,
-            };
+            root_ptr.data.depth = usize::MAX;
+            root_ptr.data.value = self.reward(&base);
         } else if depth == 1 {
-            root_ptr.data = NodeData {
-                kind: self.kind(&base),
-                depth: 0,
-                value: self.reward(&base),
-                edge: None,
-            };
+            root_ptr.data.depth = 1;
+            root_ptr.data.value = self.reward(&base);
         } else {
-            while let Some((child, edge)) = root_ptr.children.next() {
-                let value = self.minmax(child, depth - 1, cache);
-                root_ptr.data.update(value, edge);
+            if root_ptr.data.kind == NodeKind::Maximizer {
+                let mut value = f64::NEG_INFINITY;
+                while let Some((child, edge)) = root_ptr.children.next() {
+                    let child_value = self.minmax(child, depth - 1, cache);
+                    if value < child_value {
+                        value = child_value;
+                        root_ptr.data.value = value;
+                        root_ptr.data.edge = Some(edge);
+                    }
+                }
+            } else {
+                let mut value = f64::INFINITY;
+                while let Some((child, edge)) = root_ptr.children.next() {
+                    let child_value = self.minmax(child, depth - 1, cache);
+                    if value > child_value {
+                        value = child_value;
+                        root_ptr.data.value = value;
+                        root_ptr.data.edge = Some(edge);
+                    }
+                }
             }
+
             root_ptr.data.depth = depth;
             root_ptr.children.reset();
         }
@@ -108,13 +118,13 @@ where
     }
 
     fn get_or_insert(&mut self, base: Rc<V>) -> NodeRcRefCell<V, NodeData<V>> {
-        let kind = &self.kind;
+        let node_kind = self.kind(&base);
         let a = self
             .cache
             .entry(base.clone())
             .or_insert(Rc::new(RefCell::new(Node::new(
                 &base,
-                NodeData::new(kind(&base)),
+                NodeData::new(node_kind),
             ))));
         a.clone()
     }
