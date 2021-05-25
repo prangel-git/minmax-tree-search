@@ -1,4 +1,5 @@
-use super::*;
+use crate::vertex::Vertex;
+use crate::vertex_cached::VertexCached;
 
 use std::{cell::RefCell, rc::Rc};
 

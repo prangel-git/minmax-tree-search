@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use super::*;
+use crate::vertex::Vertex;
 pub struct VertexCached<V>
 where
     V: Vertex,

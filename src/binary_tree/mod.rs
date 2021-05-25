@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::minmax::*;
-use crate::Vertex;
+use crate::vertex::Vertex;
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub struct BinaryVertex {

@@ -1,58 +1,17 @@
+mod node_kind;
+pub use node_kind::NodeKind;
+
+mod node_data;
+pub use node_data::NodeData;
+
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::rc::Rc;
 
-use super::*;
-#[derive(Clone, PartialEq, Debug)]
-pub enum NodeKind {
-    Minimizer,
-    Maximizer,
-}
-
-#[derive(Debug, Clone)]
-pub struct NodeData<V>
-where
-    V: Vertex,
-{
-    pub kind: NodeKind,
-    pub depth: usize,
-    pub value: f64,
-    pub edge: Option<V::Edges>,
-}
-
-impl<V> NodeData<V>
-where
-    V: Vertex,
-{
-    pub fn new(kind: NodeKind) -> Self {
-        let value = if kind == NodeKind::Maximizer {
-            f64::NEG_INFINITY
-        } else {
-            f64::INFINITY
-        };
-        NodeData {
-            kind,
-            depth: 0,
-            value,
-            edge: None,
-        }
-    }
-
-    pub fn update(&mut self, new_value: f64, edge: V::Edges) {
-        if self.kind == NodeKind::Maximizer {
-            if self.value < new_value {
-                self.value = new_value;
-                self.edge = Some(edge);
-            }
-        } else {
-            if self.value > new_value {
-                self.value = new_value;
-                self.edge = Some(edge);
-            }
-        }
-    }
-}
+use crate::node::Node;
+use crate::node::NodeRcRefCell;
+use crate::vertex::Vertex;
 
 pub struct MinMax<V>
 where

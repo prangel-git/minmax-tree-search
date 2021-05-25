@@ -1,11 +1,8 @@
-mod vertex;
-pub use vertex::Vertex;
+pub mod vertex;
 
-mod vertex_cached;
-pub use vertex_cached::VertexCached;
+pub mod vertex_cached;
 
-mod node;
-pub use node::*;
+pub mod node;
 
 pub mod minmax;
 
