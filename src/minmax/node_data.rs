@@ -29,18 +29,4 @@ where
             edge: None,
         }
     }
-
-    pub fn update(&mut self, new_value: f64, edge: V::Edges) {
-        if self.kind == NodeKind::Maximizer {
-            if self.value < new_value {
-                self.value = new_value;
-                self.edge = Some(edge);
-            }
-        } else {
-            if self.value > new_value {
-                self.value = new_value;
-                self.edge = Some(edge);
-            }
-        }
-    }
 }
