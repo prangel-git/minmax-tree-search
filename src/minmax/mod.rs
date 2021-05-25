@@ -67,6 +67,13 @@ where
         let kind = &self.kind;
         let reward = &self.reward;
 
+        let _root = self.cache.get(&base).cloned().unwrap_or(
+            Rc::new(RefCell::new(Node::new(
+                &base, 
+                NodeData::new(kind(&base))
+            )))
+        );
+
         let root = if let Some(node) = self.cache.get(&base).cloned() {
             let data = node.borrow().data.clone();
             if data.depth >= depth {
@@ -76,7 +83,7 @@ where
             node.clone()
         } else {
             let node_data = NodeData::new(kind(&base));
-            let node = Rc::new(RefCell::new(Node::new(&base, None, None, node_data)));
+            let node = Rc::new(RefCell::new(Node::new(&base, node_data)));
             node
         };
 
