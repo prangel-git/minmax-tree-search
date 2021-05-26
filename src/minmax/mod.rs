@@ -48,7 +48,13 @@ where
         };
 
         let mut cache = HashMap::new();
-        output.minmax(root_clone, depth, &mut cache);
+        output.alphabeta(
+            root_clone,
+            depth,
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+            &mut cache,
+        );
         output.cache = cache;
         return output;
     }
@@ -56,7 +62,13 @@ where
     pub fn update(&mut self, root: Rc<V>) {
         self.root = root.clone();
         let mut cache = HashMap::new();
-        self.minmax(root, self.depth, &mut cache);
+        self.alphabeta(
+            root,
+            self.depth,
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+            &mut cache,
+        );
         self.cache = cache;
     }
 
@@ -67,10 +79,12 @@ where
         }
     }
 
-    fn minmax(
+    fn alphabeta(
         &mut self,
         base: Rc<V>,
         depth: usize,
+        alpha: f64,
+        beta: f64,
         cache: &mut HashMap<Rc<V>, NodeRcRefCell<V, NodeData<V>>>,
     ) -> f64 {
         let root = self.get_or_insert(base.clone());
@@ -89,22 +103,36 @@ where
 
             if root_ptr.data.kind == NodeKind::Maximizer {
                 let mut value = f64::NEG_INFINITY;
+                let mut next_alpha = alpha;
+
                 while let Some((child, edge)) = root_ptr.next() {
-                    let child_value = self.minmax(child, depth - 1, cache);
+                    let child_value = self.alphabeta(child, depth - 1, next_alpha, beta, cache);
                     if value < child_value {
                         value = child_value;
+                        next_alpha = value;
                         root_ptr.data.value = value;
                         root_ptr.data.edge = Some(edge);
+                    }
+
+                    if next_alpha >= beta {
+                        break;
                     }
                 }
             } else {
                 let mut value = f64::INFINITY;
+                let mut next_beta = beta;
+
                 while let Some((child, edge)) = root_ptr.next() {
-                    let child_value = self.minmax(child, depth - 1, cache);
+                    let child_value = self.alphabeta(child, depth - 1, alpha, next_beta, cache);
                     if value > child_value {
                         value = child_value;
+                        next_beta = value;
                         root_ptr.data.value = value;
                         root_ptr.data.edge = Some(edge);
+                    }
+
+                    if next_beta <= alpha {
+                        break;
                     }
                 }
             }
