@@ -1,5 +1,5 @@
 [package]
-name = "minmax"
+name = "minmax-tree-search"
 version = "0.1.0"
 authors = ["prangel-git <62568827+prangel-git@users.noreply.github.com>"]
 edition = "2018"
